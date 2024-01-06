@@ -1,0 +1,8 @@
+login screen:
+text input: username - id:username_input
+button: start - id:start_button
+
+waiting screen:
+label: waiting - id:waiting_label
+
+setup screen:

@@ -1,0 +1,25 @@
+{
+    "label":{
+        "font":{
+            "name":"Helvetica",
+            "size":"30",
+            "regular_path":"fonts/Helvetica-Font/Helvetica.ttf",
+            "bold_path":"fonts/Helvetica-Font/Helvetica-Bold.ttf",
+            "italic_path":"fonts/Helvetica-Font/Helvetica-Oblique.ttf",
+            "bold_italic_path":"fonts/Helvetica-Font/Helvetica-BoldOblique.ttf"
+        }
+    },
+    "@username_input":{
+        "font":{
+            "name":"Helvetica",
+            "size":"40"
+        }
+    },
+    "@start_btn":{
+        "font":{
+            "name":"Helvetica",
+            "size":"30"
+        }
+    }
+
+}
