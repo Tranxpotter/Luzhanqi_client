@@ -1,0 +1,32 @@
+{
+    "label":{
+        "font":{
+            "name":"Helvetica",
+            "size":"30",
+            "regular_path":"fonts/Helvetica-Font/Helvetica.ttf",
+            "bold_path":"fonts/Helvetica-Font/Helvetica-Bold.ttf",
+            "italic_path":"fonts/Helvetica-Font/Helvetica-Oblique.ttf",
+            "bold_italic_path":"fonts/Helvetica-Font/Helvetica-BoldOblique.ttf"
+        }
+    },
+    "@waiting_label":{
+        "font":{
+            "name":"Helvetica",
+            "size":"40"
+        },
+        "colours":{
+            "normal_text":"black"
+        }
+    },
+    "@players_label":{
+        "font":{
+            "name":"Helvetica",
+            "size":"30"
+        },
+        "colours":{
+            "normal_text":"black",
+            "dark_bg":"rgb(100,100,100)"
+        }
+    }
+
+}

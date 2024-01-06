@@ -13,10 +13,10 @@ class Game:
         self.board = board
 
     def update(self, game_dict:dict):
-        self.state = game_dict["state"]
-        self.players = game_dict["players"]
-        self.turn = game_dict["turn"]
-        self.board = game_dict["board"]
+        self.state = game_dict["state"] if game_dict.get("state") else self.state
+        self.players = game_dict["players"] if game_dict.get("players") else self.players
+        self.turn = game_dict["turn"] if game_dict.get("turn") else self.turn
+        self.board = game_dict["board"] if game_dict.get("board") else self.board
     
     
 
