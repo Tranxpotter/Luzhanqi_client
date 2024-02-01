@@ -15,7 +15,7 @@ import scenes
 
 async def main():
     network = Network()
-    game_info = Game(0, [], 0, [])
+    game_info = Game(0, [], [], 0, [])
     successfully_connected = await network.connect()
     if not successfully_connected:
         print("Server offline")

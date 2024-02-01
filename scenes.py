@@ -1,28 +1,25 @@
-from abc import ABC, abstractmethod
 from pygame.event import Event as Event
 
 import pygame_gui
 import pygame
 
 from network import Network
+import game as game_mod
 from game import Game
 
 
-class Scene(ABC):
-    @abstractmethod
+class Scene:
     def __init__(self, screen_size:tuple[int, int], network:Network, game:Game) -> None:
         self.network = network
         self.game = game
         self.manager = pygame_gui.UIManager(screen_size)
-    @abstractmethod
+        
     async def process_events(self, event:pygame.Event):
         self.manager.process_events(event)
 
-    @abstractmethod
     def update(self, dt:float):
         self.manager.update(dt)
 
-    @abstractmethod
     def draw_ui(self, screen:pygame.Surface):
         self.manager.draw_ui(screen)
 
@@ -116,10 +113,25 @@ class Setup(Scene):
     def __init__(self, screen_size: tuple[int, int], network: Network, game: Game) -> None:
         super().__init__(screen_size, network, game)
         
+        self.players_display = pygame_gui.elements.UITextBox(
+            "<br>".join([player_name + " " + game_mod.STATES[player_state] for player_name, player_state in zip(self.game.players, self.game.player_states)]), 
+            pygame.Rect(0, 0, screen_size[0]*0.2, screen_size[1]*0.2),
+            anchors={"right":"right", "top":"top"},
+            object_id=pygame_gui.core.ObjectID("#players_display", "@players_display"))
+        
+        self.piece_selection_panel = pygame_gui.elements.UIPanel(
+            pygame.Rect(0, 0, screen_size[0]*0.2, screen_size[1]*0.8), 
+            manager=self.manager, 
+            anchors={"right":"right", "bottom":"bottom"},
+            object_id=pygame_gui.core.ObjectID("#piece_selection_panel", "@piece_selection_panel"))
+        
+        
+        
     async def process_events(self, event: Event):
         return await super().process_events(event)
     
     def update(self, dt: float):
+        self.players_display.set_text("<br>".join([player_name + " " + game_mod.STATES[player_state] for player_name, player_state in zip(self.game.players, self.game.player_states)]))
         return super().update(dt)
     
     def draw_ui(self, screen: pygame.Surface):

@@ -1,0 +1,27 @@
+{
+    "label":{
+        "font":{
+            "name":"Helvetica",
+            "size":"30",
+            "regular_path":"fonts/Helvetica-Font/Helvetica.ttf",
+            "bold_path":"fonts/Helvetica-Font/Helvetica-Bold.ttf",
+            "italic_path":"fonts/Helvetica-Font/Helvetica-Oblique.ttf",
+            "bold_italic_path":"fonts/Helvetica-Font/Helvetica-BoldOblique.ttf"
+        }
+    },
+    "players_display":{
+        "colours":{
+            "dark_bg":"rgb(0,255,0)"
+        },
+        "font":{
+            "name":"Helvetica",
+            "size":"30"
+        }
+    },
+    "#piece_selection_panel":{
+        "colours":{
+            "dark_bg":"rgb(0,255,255)"
+        }
+    }
+
+}
