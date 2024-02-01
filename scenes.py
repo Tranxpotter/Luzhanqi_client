@@ -112,3 +112,34 @@ class Waiting(Scene):
         return super().draw_ui(screen)
     
 
+class Setup(Scene):
+    def __init__(self, screen_size: tuple[int, int], network: Network, game: Game) -> None:
+        super().__init__(screen_size, network, game)
+        
+    async def process_events(self, event: Event):
+        return await super().process_events(event)
+    
+    def update(self, dt: float):
+        return super().update(dt)
+    
+    def draw_ui(self, screen: pygame.Surface):
+        return super().draw_ui(screen)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
