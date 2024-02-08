@@ -20,9 +20,16 @@ class Space:
         if self.piece:
             return False
         
+        if self.type == 2:
+            return False
+        
         value = piece.value
         #Do value checks here
-
+        if value == 12 and self.type != 3:
+            return False
+        if value >= 10 and self.id <= 10:
+            return False
+        
         return True
     
     def place(self, piece:Piece):

@@ -29,7 +29,8 @@ class Piece:
         self.rect = pygame.Rect(pos[0], pos[1], self.rect.width, self.rect.height)
     
     def draw(self, screen:pygame.Surface):
-        pygame.draw.rect(screen, self.color, self.rect)
+        img = pygame.image.load(f"assets/pieces/{self.value}b.jpg")
+        screen.blit(img, self.rect)
     
     def on_focus(self):
         if self.in_space:
