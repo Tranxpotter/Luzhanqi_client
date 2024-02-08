@@ -138,7 +138,7 @@ class Setup(Scene):
         self.pieces:list[Piece] = []
         piece_values = [9, 8, 7, 7, 6, 6, 5, 5, 4, 4, 3, 3, 3, 2, 2, 2, 1, 1, 1, 10, 10, 11, 11, 11, 12]
         
-        piece_width, piece_height = (100, 40)
+        piece_width, piece_height = (85, 40)
         row_height = 44
         column_width = 128
         
@@ -148,14 +148,24 @@ class Setup(Scene):
             piece = Piece(pygame.Rect(x + 1030, y + 150, piece_width, piece_height), piece_value, self.piece_manager)
             self.pieces.append(piece)
         
-        
         self.spaces:list[Space] = []
-        for space_info in game.board:
+        
+        
+        
+    def space_setup(self):
+        x_start = 40
+        x_spacing = 209
+        y_start = 40
+        y_spacing = 120
+        
+        width, height = 85, 40
+        
+        for space_info in self.game.board:
             space_id = space_info[0]
-            space = Space(space_id, space_info[1], space_info[2], pygame.Rect(10, 10, 100, 100), self.piece_manager)
+            x = (space_id - 1) % 5 * x_spacing + x_start
+            y = (space_id - 1) // 5 * y_spacing + y_start
+            space = Space(space_id, space_info[1], space_info[2], pygame.Rect(x, y, width, height), self.piece_manager)
             self.spaces.append(space)
-        
-        
         
         
     async def process_events(self, event: Event):

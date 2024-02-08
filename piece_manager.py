@@ -40,7 +40,9 @@ class PieceManager:
         elif event.type == pygame.MOUSEMOTION:
             if not self.focus:
                 return
-            self.focus.move(event.pos)
+            mouse_pos = event.pos
+            piece_x, piece_y = mouse_pos[0] - self.focus.rect.width // 2, mouse_pos[1] - self.focus.rect.height // 2
+            self.focus.move((piece_x, piece_y))
         
         if self.has_setup_change():
             return True
@@ -74,6 +76,7 @@ class PieceManager:
 
         colliding[min_distance_index].place(self.focus)
         self.focus.move(colliding[min_distance_index].rect.topleft)
+        self.focus.in_space = colliding[min_distance_index]
         self._changed = True
         self.focus = None
         
@@ -87,4 +90,5 @@ class PieceManager:
     def draw(self, screen:pygame.Surface):
         for piece in self.pieces:
             piece.draw(screen)
+        
                 

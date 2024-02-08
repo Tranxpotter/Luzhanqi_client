@@ -25,7 +25,9 @@ async def main():
 
     login_scene = scenes.Login(SCREEN_SIZE, network, game_info)
     waiting_scene = scenes.Waiting(SCREEN_SIZE, network, game_info)
+    
     setup_scene = scenes.Setup(SCREEN_SIZE, network, game_info)
+    space_setup_done = False
     
     clock = pygame.time.Clock()
     dt = 0
@@ -35,6 +37,9 @@ async def main():
         if logged_in:
             game_info.update(await network.get())
         #Event handling
+        if not space_setup_done and game_info.state == game.SETTING_UP:
+            space_setup_done = True
+            setup_scene.space_setup()
         events = pygame.event.get()
         for event in events:
             if event.type == pygame.QUIT:

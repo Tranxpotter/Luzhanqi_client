@@ -1,3 +1,5 @@
+from typing import Any
+
 import pygame
 
 FIELD_MARSHAL = 9
@@ -21,14 +23,17 @@ class Piece:
         self.value = value
         self.color = (255,0,0)
         manager.add(self)
+        self.in_space:Any = None
     
     def move(self, pos:tuple[int|float, int|float]):
-        self.rect = pygame.Rect(pos[0] - self.rect.width // 2, pos[1] - self.rect.height // 2, self.rect.width, self.rect.height)\
+        self.rect = pygame.Rect(pos[0], pos[1], self.rect.width, self.rect.height)
     
     def draw(self, screen:pygame.Surface):
         pygame.draw.rect(screen, self.color, self.rect)
     
     def on_focus(self):
+        if self.in_space:
+            self.in_space.remove_piece()
         self.color = (255, 255, 0)
     
     def on_unfocus(self):

@@ -34,6 +34,12 @@ class Space:
         #Do value checks here
         
         return True
+    
+    def remove_piece(self):
+        self.piece = None
+    
+    def draw(self, screen:pygame.Surface):
+        pygame.draw.rect(screen, (0, 0, 255), self.rect)
         
         
     
