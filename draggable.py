@@ -75,23 +75,4 @@ class DraggableManager:
             object.draw(self.screen)
     
 
-class DraggablePiece(Draggable):
-    def __init__(self, manager:DraggableManager, value:int, rect:pygame.Rect) -> None:
-        manager.add(self)
-        self.value = value
-        self.rect = rect
-        self.color = (255, 255, 0)
 
-        self._original_rect = rect
-    
-    def draw(self, screen: pygame.Surface):
-        pygame.draw.rect(screen, self.color, self.rect)
-
-    def move(self, pos: tuple[int, int]):
-        self.rect = pygame.Rect(pos[0] - self.rect.width // 2, pos[1] - self.rect.height // 2, self.rect.width, self.rect.height)
-    
-    def on_focus(self):
-        self.color = (0, 255, 255)
-    
-    def on_unfocus(self):
-        self.color = (255, 255, 0)
