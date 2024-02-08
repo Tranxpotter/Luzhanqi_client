@@ -25,6 +25,7 @@ async def main():
 
     login_scene = scenes.Login(SCREEN_SIZE, network, game_info)
     waiting_scene = scenes.Waiting(SCREEN_SIZE, network, game_info)
+    setup_scene = scenes.Setup(SCREEN_SIZE, network, game_info)
     
     clock = pygame.time.Clock()
     dt = 0
@@ -44,12 +45,16 @@ async def main():
                 await login_scene.process_events(event)
             elif game_info.state == game.WAITING:
                 await waiting_scene.process_events(event)
+            elif game_info.state == game.SETTING_UP:
+                await setup_scene.process_events(event)
         
         #Update
         if not logged_in:
             login_scene.update(dt)
         elif game_info.state == game.WAITING:
             waiting_scene.update(dt)
+        elif game_info.state == game.SETTING_UP:
+            setup_scene.update(dt)
         
         #Drawing
         screen.fill((200, 200, 200))
@@ -57,6 +62,9 @@ async def main():
             login_scene.draw_ui(screen)
         elif game_info.state == game.WAITING:
             waiting_scene.draw_ui(screen)
+        elif game_info.state == game.SETTING_UP:
+            setup_scene.draw_ui(screen)
+            
 
         pygame.display.update()
 

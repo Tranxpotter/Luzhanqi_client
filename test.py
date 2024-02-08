@@ -1,16 +1,8 @@
-class Test:
-    def __init__(self) -> None:
-        x = 1
-        y = 2
+from PIL import Image
 
-print(Test().__getattribute__("abc"))
-
-
-
-
-
-
-
+with Image.open("assets/player_board.png") as img:
+    img = img.resize((1000, 720))
+    img.save("assets/player_board_resized.png")
 
 
 

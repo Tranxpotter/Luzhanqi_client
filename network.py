@@ -43,4 +43,8 @@ class Network:
         
         return data
     
+    async def setup_change(self, space_ids:list, piece_values:list) -> None:
+        if not self.conn:
+            return
+        await self.conn.send(json.dumps({"action":"setup", "space_ids":space_ids, "piece_values":piece_values}))
     

@@ -6,6 +6,9 @@ import pygame
 from network import Network
 import game as game_mod
 from game import Game
+from piece import Piece
+from piece_manager import PieceManager
+from space import Space
 
 
 class Scene:
@@ -113,29 +116,65 @@ class Setup(Scene):
     def __init__(self, screen_size: tuple[int, int], network: Network, game: Game) -> None:
         super().__init__(screen_size, network, game)
         
+        players_display_rect = pygame.Rect(0, 0, 256, 144)
+        players_display_rect.topright = (0, 0)
         self.players_display = pygame_gui.elements.UITextBox(
             "<br>".join([player_name + " " + game_mod.STATES[player_state] for player_name, player_state in zip(self.game.players, self.game.player_states)]), 
-            pygame.Rect(0, 0, screen_size[0]*0.2, screen_size[1]*0.2),
+            players_display_rect,
+            manager=self.manager, 
             anchors={"right":"right", "top":"top"},
             object_id=pygame_gui.core.ObjectID("#players_display", "@players_display"))
         
+        piece_selection_panel_rect = pygame.Rect(0, 0, 256, 576)
+        piece_selection_panel_rect.bottomright = (0, 0)
         self.piece_selection_panel = pygame_gui.elements.UIPanel(
-            pygame.Rect(0, 0, screen_size[0]*0.2, screen_size[1]*0.8), 
+            piece_selection_panel_rect, 
             manager=self.manager, 
             anchors={"right":"right", "bottom":"bottom"},
             object_id=pygame_gui.core.ObjectID("#piece_selection_panel", "@piece_selection_panel"))
         
+        self.piece_manager = PieceManager(self.game)
+        
+        self.pieces:list[Piece] = []
+        piece_values = [9, 8, 7, 7, 6, 6, 5, 5, 4, 4, 3, 3, 3, 2, 2, 2, 1, 1, 1, 10, 10, 11, 11, 11, 12]
+        
+        piece_width, piece_height = (100, 40)
+        row_height = 44
+        column_width = 128
+        
+        for index, piece_value in enumerate(piece_values):
+            x, y = index%2 * column_width, index//2 * row_height
+            
+            piece = Piece(pygame.Rect(x + 1030, y + 150, piece_width, piece_height), piece_value, self.piece_manager)
+            self.pieces.append(piece)
+        
+        
+        self.spaces:list[Space] = []
+        for space_info in game.board:
+            space_id = space_info[0]
+            space = Space(space_id, space_info[1], space_info[2], pygame.Rect(10, 10, 100, 100), self.piece_manager)
+            self.spaces.append(space)
+        
+        
         
         
     async def process_events(self, event: Event):
-        return await super().process_events(event)
+        setup_changed = self.piece_manager.handle_event(event)
+        if setup_changed:
+            await self.network.setup_change([space.id for space in self.spaces], [None if space.piece is None else space.piece.value for space in self.spaces])
+        await super().process_events(event)
     
     def update(self, dt: float):
         self.players_display.set_text("<br>".join([player_name + " " + game_mod.STATES[player_state] for player_name, player_state in zip(self.game.players, self.game.player_states)]))
-        return super().update(dt)
+        super().update(dt)
     
     def draw_ui(self, screen: pygame.Surface):
-        return super().draw_ui(screen)
+        board_image = pygame.image.load("assets/player_board.png")
+        screen.blit(board_image, (0, 0))
+        
+        super().draw_ui(screen)
+        self.piece_manager.draw(screen)
+        
 
 
 
