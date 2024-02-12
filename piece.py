@@ -35,6 +35,7 @@ class Piece:
     def on_focus(self):
         if self.in_space:
             self.in_space.remove_piece()
+            self.in_space = None
         self.color = (255, 255, 0)
     
     def on_unfocus(self):

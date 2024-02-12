@@ -46,7 +46,9 @@ class Space:
         self.piece = None
     
     def draw(self, screen:pygame.Surface):
-        pygame.draw.rect(screen, (0, 0, 255), self.rect)
+        surface = pygame.Surface(self.rect.size, pygame.SRCALPHA)
+        pygame.draw.rect(surface, (255, 255, 0, 100), surface.get_rect())
+        screen.blit(surface, self.rect)
         
         
     

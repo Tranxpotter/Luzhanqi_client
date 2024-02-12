@@ -9,18 +9,29 @@
             "bold_italic_path":"fonts/Helvetica-Font/Helvetica-BoldOblique.ttf"
         }
     },
-    "players_display":{
+    "#players_display":{
         "colours":{
-            "dark_bg":"rgb(0,255,0)"
+            "dark_bg":"rgb(100,100,100)",
+            "normal_text":"black"
         },
         "font":{
             "name":"Helvetica",
-            "size":"30"
+            "size":"20"
         }
     },
     "#piece_selection_panel":{
         "colours":{
             "dark_bg":"rgb(0,255,255)"
+        }
+    },
+    "#ready_btn":{
+        "colours":{
+            "dark_bg":"rgb(100, 255, 100)",
+            "normal_text":"white"
+        },
+        "font":{
+            "name":"Helvetica",
+            "size":"20"
         }
     }
 

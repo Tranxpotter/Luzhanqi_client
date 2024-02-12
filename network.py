@@ -48,3 +48,8 @@ class Network:
             return
         await self.conn.send(json.dumps({"action":"setup", "space_ids":space_ids, "piece_values":piece_values}))
     
+    async def ready(self) -> None:
+        if not self.conn:
+            return
+        await self.conn.send(json.dumps({"action":"ready"}))
+    

@@ -88,7 +88,12 @@ class PieceManager:
         return False
     
     def draw(self, screen:pygame.Surface):
+        if self.focus:
+            for space in self.spaces:
+                if space.check_placable(self.focus):
+                    space.draw(screen)
         for piece in self.pieces:
             piece.draw(screen)
+
         
                 

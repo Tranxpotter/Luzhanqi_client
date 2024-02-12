@@ -115,6 +115,7 @@ class Waiting(Scene):
 class Setup(Scene):
     def __init__(self, screen_size: tuple[int, int], network: Network, game: Game) -> None:
         super().__init__(screen_size, network, game)
+        self.manager.get_theme().load_theme("themes/setup_theme.json")
         
         players_display_rect = pygame.Rect(0, 0, 256, 144)
         players_display_rect.topright = (0, 0)
@@ -150,6 +151,20 @@ class Setup(Scene):
         
         self.spaces:list[Space] = []
         
+        ready_btn_rect = pygame.Rect(0, 0, 85, 40)
+        ready_btn_rect.bottomright = (0, 0)
+        self.ready_btn = pygame_gui.elements.UIButton(ready_btn_rect, 
+                                                 "Ready", manager=self.manager, 
+                                                 anchors={"right":"right", "bottom":"bottom"},
+                                                 object_id=pygame_gui.core.ObjectID("#ready_btn", "@ready_btn"),
+                                                 starting_height=2
+                                                 )
+        self.ready_btn.visible = 0
+        
+        
+        self.ready = False
+        
+    
         
         
     def space_setup(self):
@@ -169,6 +184,13 @@ class Setup(Scene):
         
         
     async def process_events(self, event: Event):
+        if self.ready:
+            return
+        print(event)
+        if event.type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element == self.ready_btn:
+            await self.network.ready()
+            self.ready = True
+            return
         setup_changed = self.piece_manager.handle_event(event)
         if setup_changed:
             await self.network.setup_change([space.id for space in self.spaces], [None if space.piece is None else space.piece.value for space in self.spaces])
@@ -176,6 +198,11 @@ class Setup(Scene):
     
     def update(self, dt: float):
         self.players_display.set_text("<br>".join([player_name + " " + game_mod.STATES[player_state] for player_name, player_state in zip(self.game.players, self.game.player_states)]))
+        if all([piece.in_space for piece in self.pieces]):
+            self.ready_btn.visible = 1
+        else:
+            self.ready_btn.visible = 0
+        
         super().update(dt)
     
     def draw_ui(self, screen: pygame.Surface):
@@ -187,7 +214,9 @@ class Setup(Scene):
         
 
 
-
+class Playing(Scene):
+    def __init__(self, screen_size: tuple[int, int], network: Network, game: Game) -> None:
+        super().__init__(screen_size, network, game)
 
 
 

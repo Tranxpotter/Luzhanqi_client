@@ -29,6 +29,8 @@ async def main():
     setup_scene = scenes.Setup(SCREEN_SIZE, network, game_info)
     space_setup_done = False
     
+    playing_scene = scenes.Playing(SCREEN_SIZE, network, game_info)
+    
     clock = pygame.time.Clock()
     dt = 0
     running = True
