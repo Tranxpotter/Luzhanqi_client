@@ -53,3 +53,8 @@ class Network:
             return
         await self.conn.send(json.dumps({"action":"ready"}))
     
+    async def play(self, origin:tuple, destination:tuple) -> None:
+        if not self.conn:
+            return
+        await self.conn.send(json.dumps({"action":"play", "origin":origin, "destination":destination}))
+        

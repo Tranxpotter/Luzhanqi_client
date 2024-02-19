@@ -7,8 +7,9 @@ from network import Network
 import game as game_mod
 from game import Game
 from piece import Piece
-from piece_manager import PieceManager
+from piece_manager import SetupPieceManager, PlayingPieceManager
 from space import Space
+from utils import *
 
 
 class Scene:
@@ -134,19 +135,19 @@ class Setup(Scene):
             anchors={"right":"right", "bottom":"bottom"},
             object_id=pygame_gui.core.ObjectID("#piece_selection_panel", "@piece_selection_panel"))
         
-        self.piece_manager = PieceManager(self.game)
+        self.piece_manager = SetupPieceManager(self.game)
         
         self.pieces:list[Piece] = []
         piece_values = [9, 8, 7, 7, 6, 6, 5, 5, 4, 4, 3, 3, 3, 2, 2, 2, 1, 1, 1, 10, 10, 11, 11, 11, 12]
         
-        piece_width, piece_height = (85, 40)
+        piece_size = piece_width, piece_height = (85, 40)
         row_height = 44
         column_width = 128
         
         for index, piece_value in enumerate(piece_values):
             x, y = index%2 * column_width, index//2 * row_height
             
-            piece = Piece(pygame.Rect(x + 1030, y + 150, piece_width, piece_height), piece_value, self.piece_manager)
+            piece = Piece(pygame.Rect(x + 1030, y + 150, piece_width, piece_height), piece_value, self.piece_manager, piece_size)
             self.pieces.append(piece)
         
         self.spaces:list[Space] = []
@@ -186,7 +187,6 @@ class Setup(Scene):
     async def process_events(self, event: Event):
         if self.ready:
             return
-        print(event)
         if event.type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element == self.ready_btn:
             await self.network.ready()
             self.ready = True
@@ -217,15 +217,137 @@ class Setup(Scene):
 class Playing(Scene):
     def __init__(self, screen_size: tuple[int, int], network: Network, game: Game) -> None:
         super().__init__(screen_size, network, game)
+        self.manager.get_theme().load_theme("themes/playing_theme.json")
+        
+        players_display_rect = pygame.Rect(0, 0, 256, 144)
+        players_display_rect.topright = (0, 0)
+        self.players_display = pygame_gui.elements.UITextBox(
+            "<br>".join([player_name + " <--" if index + 1 == self.game.turn else player_name for index, player_name in enumerate(self.game.players)]), 
+            players_display_rect,
+            manager=self.manager, 
+            anchors={"right":"right", "top":"top"},
+            object_id=pygame_gui.core.ObjectID("#players_display", "@players_display"))
+        
+        history_display_rect = pygame.Rect(0, 0, 256, 576)
+        history_display_rect.bottomright = (0, 0)
+        
+        
+        self.piece_manager = PlayingPieceManager(self.game, self.network)
+        
+        self.board_pos = (0, 0)
+        self._holding_key = None
+        self._move_velocity = 1000
+        self.board_zoom = 1
+        
+        
+        
+        
+    
+    def setup(self, board:list[list]):
+        self.piece_manager.reset()
+        player_boards, connecting_spaces = board
+        player_num = self.network.player_num
+        enemy_num = 2 if player_num == 1 else 1
+        self_board = player_boards[player_num-1]
+        enemy_board = player_boards[enemy_num-1]
+        
+        piece_size = piece_width, piece_height = (100, 50)
+        row_height = 150
+        column_width = 250
+        
+        start_x, start_y = (50, 50)
+        for space in enemy_board[1]:
+            space_id, space_type, piece_value = space
+            space_x = (30-space_id) % 5 * column_width + start_x
+            space_y = (30-space_id) // 5 * row_height + start_y
+            if piece_value:
+                piece = Piece(pygame.Rect(space_x, space_y, piece_width, piece_height), piece_value, self.piece_manager, piece_size)
+            else:
+                piece = None
+            Space(space_id, space_type, piece, pygame.Rect(space_x, space_y, piece_width, piece_height), self.piece_manager, enemy_space=True)
+
+        start_x, start_y = 50, 1025
+        for space in connecting_spaces:
+            space_id, space_type, piece_value = space
+            space_pos = 3-space_id if player_num == 2 else space_id-1
+            space_x = space_pos * column_width * 2 + start_x
+            space_y = start_y
+            if piece_value:
+                piece = Piece(pygame.Rect(space_x, space_y, piece_width, piece_height), piece_value, self.piece_manager, piece_size)
+            else:
+                piece = None
+            Space(space_id, space_type, piece, pygame.Rect(space_x, space_y, piece_width, piece_height), self.piece_manager, connecting_space=True)
+        
+            
+        start_x, start_y = (50, 1250)
+        for space in self_board[1]:
+            space_id, space_type, piece_value = space
+            space_x = (space_id-1) % 5 * column_width + start_x
+            space_y = (space_id-1) // 5 * row_height + start_y
+            if piece_value:
+                piece = Piece(pygame.Rect(space_x, space_y, piece_width, piece_height), piece_value, self.piece_manager, piece_size)
+            else:
+                piece = None
+            Space(space_id, space_type, piece, pygame.Rect(space_x, space_y, piece_width, piece_height), self.piece_manager)
+        
+    def move_board(self, direction, magnitude):
+        board_x = 0 if self.board_pos[0] - direction[0] * magnitude < 0 else int(self.board_pos[0] - direction[0] * magnitude)
+        board_y = 0 if self.board_pos[1] - direction[1] * magnitude < 0 else int(self.board_pos[1] - direction[1] * magnitude)
+        self.board_pos = (board_x, board_y)
+    
+    async def process_events(self, event: Event):
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_e or event.key == pygame.K_PAGEDOWN:
+                self.board_zoom += 0.1
+                if self.board_zoom > 2:
+                    self.board_zoom = 2
+                    
+            elif event.key == pygame.K_q or event.key == pygame.K_PAGEUP:
+                self.board_zoom -= 0.1
+                if self.board_zoom < 0.5:
+                    self.board_zoom = 0.5
+                    
+            else:
+                self._holding_key = event.key
+            
+        elif event.type == pygame.KEYUP:
+            if event.key == self._holding_key:
+                self._holding_key = None
+        
+        
+        
+        await self.piece_manager.handle_event(event, self.board_pos, self.board_zoom)
+        await super().process_events(event)
 
 
+    def update(self, dt: float):
+        key_match = {
+            pygame.K_w : (0, 1),
+            pygame.K_s : (0, -1),
+            pygame.K_d : (-1, 0),
+            pygame.K_a : (1, 0),
+            pygame.K_UP : (0, 1),
+            pygame.K_DOWN : (0, -1),
+            pygame.K_RIGHT : (-1, 0),
+            pygame.K_LEFT : (1, 0)
+        }
+        if self._holding_key and self._holding_key in key_match.keys():
+            self.move_board(key_match[self._holding_key], dt*self._move_velocity)
+        
+        self.players_display.set_text("<br>".join([player_name + " <--" if index + 1 == self.game.turn else player_name for index, player_name in enumerate(self.game.players)]))
+                
+        return super().update(dt)
 
 
-
-
-
-
-
+    def draw_ui(self, screen: pygame.Surface):
+        
+        board_image = pygame.image.load("assets/Luzhanqi_board.png")
+        self.piece_manager.draw(board_image)
+        board_image = pygame.transform.scale(board_image, cords_multiply(board_image.get_size(), (self.board_zoom, self.board_zoom)))
+        
+        screen.blit(board_image, (-self.board_pos[0] * self.board_zoom, -self.board_pos[1] * self.board_zoom))
+        
+        return super().draw_ui(screen)
 
 
 

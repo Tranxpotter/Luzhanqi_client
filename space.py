@@ -8,13 +8,20 @@ CAMPSITE = 2
 HEADQUARTER = 3
 
 class Space:
-    def __init__(self, id:int, type:int, piece, rect:pygame.Rect, manager) -> None:
+    def __init__(self, id:int, type:int, piece, rect:pygame.Rect, manager, enemy_space:bool = False, connecting_space:bool = False) -> None:
         self.id = id
         self.type = type
         self.piece = piece
         self.rect = rect
         self.piece:Piece|None = piece
-        manager.add(self)
+        if self.piece:
+            self.piece.in_space = self
+        if enemy_space:
+            manager.add(self, "enemy")
+        elif connecting_space:
+            manager.add(self, "connecting")
+        else:
+            manager.add(self)
     
     def check_placable(self, piece:Piece) -> bool:
         if self.piece:

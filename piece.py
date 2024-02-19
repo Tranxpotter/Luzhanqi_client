@@ -17,20 +17,26 @@ FLAG = 12
 ENEMY = 13
 
 class Piece:
-    def __init__(self, rect:pygame.Rect, value:int, manager) -> None:
+    def __init__(self, rect:pygame.Rect, value:int, manager, size:tuple[int|float, int|float]) -> None:
         self.rect = rect
         self._original_rect = rect
         self.value = value
         self.color = (255,0,0)
         manager.add(self)
         self.in_space:Any = None
+        self.size = size
     
     def move(self, pos:tuple[int|float, int|float]):
         self.rect = pygame.Rect(pos[0], pos[1], self.rect.width, self.rect.height)
     
     def draw(self, screen:pygame.Surface):
-        img = pygame.image.load(f"assets/pieces/{self.value}b.jpg")
-        screen.blit(img, self.rect)
+        if self.value < 13:
+            img = pygame.image.load(f"assets/pieces/{self.value}b.jpg")
+            if img.get_size() != self.size:
+                img = pygame.transform.scale(img, self.size)
+            screen.blit(img, self.rect)
+        else:
+            pygame.draw.rect(screen, (255, 0, 0), self.rect)
     
     def on_focus(self):
         if self.in_space:

@@ -30,6 +30,14 @@ async def main():
     space_setup_done = False
     
     playing_scene = scenes.Playing(SCREEN_SIZE, network, game_info)
+    playing_setup_done = False
+    
+    scene_match:dict[int, scenes.Scene] = {
+        game.WAITING : waiting_scene,
+        game.SETTING_UP : setup_scene,
+        game.READY : setup_scene,
+        game.PLAYING : playing_scene
+    }
     
     clock = pygame.time.Clock()
     dt = 0
@@ -42,6 +50,12 @@ async def main():
         if not space_setup_done and game_info.state == game.SETTING_UP:
             space_setup_done = True
             setup_scene.space_setup()
+        if game_info.state == game.PLAYING and (not playing_setup_done or game_info.check_turn_changed()):
+            playing_setup_done = True
+            playing_scene.setup(game_info.board)
+        
+
+        
         events = pygame.event.get()
         for event in events:
             if event.type == pygame.QUIT:
@@ -50,27 +64,20 @@ async def main():
                 running = False
             if not logged_in:
                 await login_scene.process_events(event)
-            elif game_info.state == game.WAITING:
-                await waiting_scene.process_events(event)
-            elif game_info.state == game.SETTING_UP:
-                await setup_scene.process_events(event)
+            else:
+                await scene_match[game_info.state].process_events(event)
         
         #Update
         if not logged_in:
             login_scene.update(dt)
-        elif game_info.state == game.WAITING:
-            waiting_scene.update(dt)
-        elif game_info.state == game.SETTING_UP:
-            setup_scene.update(dt)
-        
+        else:
+            scene_match[game_info.state].update(dt)
         #Drawing
         screen.fill((200, 200, 200))
         if not logged_in:
             login_scene.draw_ui(screen)
-        elif game_info.state == game.WAITING:
-            waiting_scene.draw_ui(screen)
-        elif game_info.state == game.SETTING_UP:
-            setup_scene.draw_ui(screen)
+        else:
+            scene_match[game_info.state].draw_ui(screen)
             
 
         pygame.display.update()

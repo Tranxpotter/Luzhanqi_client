@@ -18,15 +18,24 @@ class Game:
         self.players = players
         self.player_states = player_states
         self.turn = turn
+        self._turn_changed = False
         self.board = board
 
     def update(self, game_dict:dict):
         self.state = game_dict["state"] if game_dict.get("state") else self.state
         self.players = game_dict["players"] if game_dict.get("players") else self.players
         self.player_states = game_dict["player_states"] if game_dict.get("player_states") else self.player_states
-        self.turn = game_dict["turn"] if game_dict.get("turn") else self.turn
+        curr_turn = game_dict["turn"] if game_dict.get("turn") else self.turn
+        if self.turn != curr_turn:
+            self._turn_changed = True
+        self.turn = curr_turn
         self.board = game_dict["board"] if game_dict.get("board") else self.board
     
+    def check_turn_changed(self) -> bool:
+        if self._turn_changed:
+            self._turn_changed = False
+            return True
+        return False
     
 
 
