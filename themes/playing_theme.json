@@ -13,12 +13,18 @@
         "font":{
             "name":"Helvetica",
             "size":80
+        },
+        "colours":{
+            "normal_text":"black"
         }
     },
     "@result_btn":{
         "font":{
             "name":"Helvetica",
             "size":50
+        },
+        "colours":{
+            "dark_bg":"red"
         }
     }
 }
