@@ -11,7 +11,7 @@ from game import Game
 import scenes
 
 
-
+run = True
 
 async def main():
     network = Network()
@@ -36,13 +36,13 @@ async def main():
         game.WAITING : waiting_scene,
         game.SETTING_UP : setup_scene,
         game.READY : setup_scene,
-        game.PLAYING : playing_scene
+        game.PLAYING : playing_scene,
+        game.END : playing_scene
     }
     
     clock = pygame.time.Clock()
     dt = 0
-    running = True
-    while running:
+    while game_info.running:
         logged_in = network.player_num != 0
         if logged_in:
             game_info.update(await network.get())
@@ -61,7 +61,7 @@ async def main():
             if event.type == pygame.QUIT:
                 if network.conn:
                     await network.conn.close()
-                running = False
+                game_info.running = False
             if not logged_in:
                 await login_scene.process_events(event)
             else:
@@ -85,7 +85,11 @@ async def main():
         
 
         dt = clock.tick(60) / 1000
+    global run
+    run = game_info.restart
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    while run:
+        run = False
+        asyncio.run(main())
     pygame.quit()

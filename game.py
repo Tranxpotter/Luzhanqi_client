@@ -1,6 +1,7 @@
 WAITING = 0
 SETTING_UP = 1
 PLAYING = 2
+END = 4
 
 #Player only states
 READY = 3
@@ -20,6 +21,8 @@ class Game:
         self.turn = turn
         self._turn_changed = False
         self.board = board
+        self.running = True
+        self.restart = False
 
     def update(self, game_dict:dict):
         self.state = game_dict["state"] if game_dict.get("state") else self.state

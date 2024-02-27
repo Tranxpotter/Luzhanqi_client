@@ -222,7 +222,7 @@ class Playing(Scene):
         players_display_rect = pygame.Rect(0, 0, 256, 144)
         players_display_rect.topright = (0, 0)
         self.players_display = pygame_gui.elements.UITextBox(
-            "<br>".join([player_name + " <--" if index + 1 == self.game.turn else player_name for index, player_name in enumerate(self.game.players)]), 
+            "<br>".join([(player_name if index + 1 != self.network.player_num else player_name + " (YOU)") + " <--" if index + 1 == self.game.turn else player_name for index, player_name in enumerate(self.game.players)]),
             players_display_rect,
             manager=self.manager, 
             anchors={"right":"right", "top":"top"},
@@ -238,6 +238,32 @@ class Playing(Scene):
         self._holding_key = None
         self._move_velocity = 1000
         self.board_zoom = 1
+        
+        
+        self.winning_text = pygame_gui.elements.UILabel(pygame.Rect(0, 0, 600, 200),
+                                                        "You WIN!",
+                                                        self.manager,
+                                                        object_id=pygame_gui.core.ObjectID("#winning_text", "@result"),
+                                                        anchors={"center":"center"})
+        self.winning_text.visible = 0
+        
+        self.losing_text = pygame_gui.elements.UILabel(pygame.Rect(0, -100, 600, 200),
+                                                        "You LOSE!",
+                                                        self.manager,
+                                                        object_id=pygame_gui.core.ObjectID("#losing_text", "@result"),
+                                                        anchors={"center":"center"})
+        self.losing_text.visible = 0
+        
+        self.return_btn = pygame_gui.elements.UIButton(pygame.Rect(0, 100, 500, 100),
+                                                       "Return to main menu",
+                                                       self.manager,
+                                                       object_id=pygame_gui.core.ObjectID("#return_btn", "@result_btn"),
+                                                       anchors={"center":"center"})
+        self.return_btn.visible = 0
+        
+        self._done_end_seq = False
+        
+        
         
         
         
@@ -314,6 +340,9 @@ class Playing(Scene):
             if event.key == self._holding_key:
                 self._holding_key = None
         
+        elif event.type == pygame_gui.UI_BUTTON_PRESSED:
+            if event.ui_element == self.return_btn:
+                self.game.restart = True
         
         
         await self.piece_manager.handle_event(event, self.board_pos, self.board_zoom)
@@ -321,6 +350,14 @@ class Playing(Scene):
 
 
     def update(self, dt: float):
+        if not self._done_end_seq and self.game.state == game_mod.END:
+            is_win = True if self.game.turn == self.network.player_num else False
+            if is_win:
+                self.winning_text.visible = 1
+            else:
+                self.losing_text.visible = 1
+            self.return_btn.visible = 1
+            
         key_match = {
             pygame.K_w : (0, 1),
             pygame.K_s : (0, -1),
@@ -334,8 +371,8 @@ class Playing(Scene):
         if self._holding_key and self._holding_key in key_match.keys():
             self.move_board(key_match[self._holding_key], dt*self._move_velocity)
         
-        self.players_display.set_text("<br>".join([player_name + " <--" if index + 1 == self.game.turn else player_name for index, player_name in enumerate(self.game.players)]))
-                
+        self.players_display.set_text("<br>".join([(player_name if index + 1 != self.network.player_num else player_name + " (YOU)") + " <--" if index + 1 == self.game.turn else player_name for index, player_name in enumerate(self.game.players)]))
+
         return super().update(dt)
 
 

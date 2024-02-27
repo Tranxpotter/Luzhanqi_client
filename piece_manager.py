@@ -242,7 +242,7 @@ class PlayingPieceManager:
             dest_space_info = (4, 0)
         
         self.focus.rect = self.focus._original_rect
-        self.focus.in_space = dest_space
+        self.focus.in_space = self._origin_space
         await self.network.play(origin_space_info, dest_space_info)
         self._changed = True
         self.focus = None

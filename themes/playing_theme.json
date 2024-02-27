@@ -8,5 +8,17 @@
             "italic_path":"fonts/Helvetica-Font/Helvetica-Oblique.ttf",
             "bold_italic_path":"fonts/Helvetica-Font/Helvetica-BoldOblique.ttf"
         }
+    }, 
+    "@result":{
+        "font":{
+            "name":"Helvetica",
+            "size":80
+        }
+    },
+    "@result_btn":{
+        "font":{
+            "name":"Helvetica",
+            "size":50
+        }
     }
 }
