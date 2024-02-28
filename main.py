@@ -51,6 +51,8 @@ async def main():
             space_setup_done = True
             setup_scene.space_setup()
         if game_info.state == game.PLAYING and (not playing_setup_done or game_info.check_turn_changed()):
+            print("set up")
+            playing_scene._saved_curr_state = False
             playing_setup_done = True
             playing_scene.setup(game_info.board)
         

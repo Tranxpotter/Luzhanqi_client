@@ -263,13 +263,36 @@ class Playing(Scene):
         
         self._done_end_seq = False
         
+        self.history = []
+        self.view_history_mode = False
+        history_display_rect = pygame.Rect(0, 0, 256, 576)
+        history_display_rect.bottomright = (0, 0)
+        self.history_display = pygame_gui.elements.UIPanel(history_display_rect,
+                                                           1,
+                                                           self.manager,
+                                                           anchors={"right":"right", "bottom":"bottom"})
+        
+        self._saved_curr_state = False
+        
+        self.history_btns = []
         
         
+    
         
         
         
     
     def setup(self, board:list[list]):
+        if not self._saved_curr_state:
+            self.history.append(board)
+            btn_height = (len(self.history) - 1) * 50
+            btn = pygame_gui.elements.UIButton(pygame.Rect(0, btn_height, 256, 50), 
+                                               "2" if self.game.turn == 1 else "1",
+                                               self.manager,
+                                               self.history_display,
+                                               object_id=pygame_gui.core.ObjectID(f"#history_{len(self.history) - 1}", "@history_btn"))
+            self.history_btns.append(btn)
+            self._saved_curr_state = True
         self.piece_manager.reset()
         player_boards, connecting_spaces = board
         player_num = self.network.player_num
@@ -343,9 +366,17 @@ class Playing(Scene):
         elif event.type == pygame_gui.UI_BUTTON_PRESSED:
             if event.ui_element == self.return_btn:
                 self.game.restart = True
+            
+            elif event.ui_element in self.history_btns:
+                history_index = self.history_btns.index(event.ui_element)
+                if history_index != len(self.history_btns) - 1:
+                    self.view_history_mode = True
+                else:
+                    self.view_history_mode = False
+                self.setup(self.history[history_index])
         
-        
-        await self.piece_manager.handle_event(event, self.board_pos, self.board_zoom)
+        if not self.view_history_mode:
+            await self.piece_manager.handle_event(event, self.board_pos, self.board_zoom)
         await super().process_events(event)
 
 

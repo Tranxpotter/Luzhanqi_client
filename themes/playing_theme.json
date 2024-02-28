@@ -26,5 +26,11 @@
         "colours":{
             "dark_bg":"red"
         }
+    },
+    "@history_btn":{
+        "font":{
+            "name":"Helvetica",
+            "size":"30"
+        }
     }
 }
